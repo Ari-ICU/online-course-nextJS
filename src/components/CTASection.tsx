@@ -237,18 +237,6 @@ const CTASection = ({ courseTitle, price, slug, status = 'available' }: CTASecti
                   </>
                 )}
               </div>
-
-              {/* Social proof */}
-              <div className="mt-6 sm:mt-8 md:mt-10 text-center">
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 md:gap-6 text-blue-100 text-xs sm:text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="text-yellow-300">★★★★★</span>
-                    <span>4.9/5 rating</span>
-                  </div>
-                  <div>12,000+ students</div>
-                  <div>98% completion rate</div>
-                </div>
-              </div>
             </>
           )}
         </div>

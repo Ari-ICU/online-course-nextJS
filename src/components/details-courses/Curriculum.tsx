@@ -30,17 +30,17 @@ export default function Curriculum({ course, selectedLessonId, onSelectLesson }:
     >
       {/* Header */}
       <div className="mb-5">
-        <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Curriculum</h3>
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Course Curriculum</h3>
         <p className="text-sm text-gray-600 mt-1">
           {course.curriculum.length} section{course.curriculum.length !== 1 ? 's' : ''} •{' '}
-          {totalLessons} lesson{totalLessons !== 1 ? 's' : ''} • {course.duration} total
+          {totalLessons} lesson{totalLessons !== 1 ? 's' : ''} • {course.duration} total length
         </p>
       </div>
 
       {/* Curriculum List */}
       <div className="space-y-1">
         {course.curriculum.length === 0 ? (
-          <p className="text-gray-500 text-sm py-2">No modules available.</p>
+          <p className="text-gray-500 text-sm py-2">No modules available at this time.</p>
         ) : (
           course.curriculum.map((module, index) => {
             const isExpanded = expandedModules.includes(module.id);
@@ -125,7 +125,11 @@ export default function Curriculum({ course, selectedLessonId, onSelectLesson }:
                                   isSelected ? 'text-blue-700' : 'text-gray-500'
                                 }`}
                               >
-                                {lesson.type}
+                                {lesson.type === 'video'
+                                  ? 'Video'
+                                  : lesson.type === 'reading'
+                                  ? 'Reading'
+                                  : 'Assignment'}
                               </p>
                             </div>
                           </div>
@@ -135,7 +139,7 @@ export default function Curriculum({ course, selectedLessonId, onSelectLesson }:
                             {lesson.freePreview && (
                               <span
                                 className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full"
-                                aria-label="Free preview available"
+                                aria-label="Free preview"
                               >
                                 Free
                               </span>

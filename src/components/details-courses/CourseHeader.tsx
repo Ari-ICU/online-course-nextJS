@@ -101,7 +101,7 @@ export default function CourseHeader({ course, totalLessons, isEnrolled }: Cours
 
           {/* Right section - Preview card */}
           <div className="lg:col-span-1">
-            <CoursePreviewCard course={course} isEnrolled={isEnrolled} />
+            <CoursePreviewCard course={course} />
           </div>
         </div>
       </div>
