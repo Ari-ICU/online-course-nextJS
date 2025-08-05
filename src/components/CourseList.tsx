@@ -1,5 +1,3 @@
-// src/components/course-list/CourseList.tsx
-
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
@@ -8,9 +6,9 @@ import { motion, AnimatePresence, Variants } from "framer-motion";
 import CourseCard from "@/components/course-list/CourseCard";
 import Filters from "@/components/course-list/Filters";
 import CourseCardSkeleton from "@/components/course-list/CourseCardSkeleton";
-import { CourseListProps, SortOption, Course, Instructor } from "@/types";
+import { CourseListProps, SortOption } from "@/types";
 import { coursesMeta } from "@/data/course";
-import { enrolledCourseIds } from "@/data/enrolledCourses";
+import { enrolledCourseIds } from '@/data/enrolledCourses';
 
 const CourseList: React.FC<CourseListProps> = ({
   showFilters = true,
@@ -51,7 +49,7 @@ const CourseList: React.FC<CourseListProps> = ({
         const matchesLevel = selectedLevel === "All" || course.level === selectedLevel;
         return matchesSearch && matchesCategory && matchesLevel;
       })
-      .map((course): Course => ({
+      .map((course) => ({
         ...course,
         id: course.id || "",
         slug: course.slug || "",
@@ -77,9 +75,9 @@ const CourseList: React.FC<CourseListProps> = ({
           jobTitle: "",
           socialLinks: {},
         },
-        curriculum: [], // Provide default directly, do not reference course.curriculum
-        reviews: [], // Provide default directly, do not reference course.reviews
-        relatedCourses: [], // Provide default directly, do not reference course.relatedCourses
+        curriculum: [],
+        reviews: [],
+        relatedCourses: [],
       }))
       .sort((a, b) => {
         switch (sortBy) {
@@ -145,16 +143,16 @@ const CourseList: React.FC<CourseListProps> = ({
   // Handle empty course data
   if (coursesMeta.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="text-center py-16"
+          className="text-center py-12 sm:py-16"
         >
-          <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Courses Available</h3>
-          <p className="text-gray-600 mb-6">It looks like there are no courses to display at the moment.</p>
+          <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Courses Available</h3>
+          <p className="text-sm sm:text-base text-gray-600 mb-6">It looks like there are no courses to display at the moment.</p>
         </motion.div>
       </div>
     );
@@ -162,15 +160,15 @@ const CourseList: React.FC<CourseListProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">{title}</h1>
-          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">{subtitle}</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-3 sm:mb-4"> {title}</h1>
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">{subtitle}</p>
         </motion.div>
 
         {showFilters && (
@@ -191,13 +189,13 @@ const CourseList: React.FC<CourseListProps> = ({
         )}
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {Array.from({ length: coursesPerPage }).map((_, i) => (
               <CourseCardSkeleton key={i} />
             ))}
           </div>
         ) : paginatedCourses.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <AnimatePresence>
               {paginatedCourses.map((course, index) => (
                 <motion.div
@@ -208,19 +206,19 @@ const CourseList: React.FC<CourseListProps> = ({
                   animate="visible"
                   exit="hidden"
                 >
-                  <CourseCard course={course} isEnrolled={enrolledCourseIds.includes(course.id)} />
+                  <CourseCard course={course} isEnrolled={enrolledCourseIds.includes(course.slug ?? '')} />
                 </motion.div>
               ))}
             </AnimatePresence>
           </div>
         ) : (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="text-center py-16">
-            <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No courses found</h3>
-            <p className="text-gray-600 mb-6">Try adjusting your search criteria or filters</p>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="text-center py-12 sm:py-16">
+            <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No courses found</h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-6">Try adjusting your search criteria or filters</p>
             <button
               onClick={resetFilters}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base"
             >
               Clear Filters
             </button>
@@ -232,7 +230,7 @@ const CourseList: React.FC<CourseListProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex justify-center items-center mt-12 space-x-2"
+            className="flex justify-center items-center mt-8 sm:mt-12 space-x-2"
             aria-label="Pagination"
           >
             <motion.button
@@ -247,7 +245,7 @@ const CourseList: React.FC<CourseListProps> = ({
               whileHover={{ scale: currentPage === 1 ? 1 : 1.1 }}
               whileTap={{ scale: currentPage === 1 ? 1 : 0.9 }}
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 sm:w-6 h-5 sm:h-6" />
             </motion.button>
 
             <div className="flex space-x-1">
@@ -255,7 +253,7 @@ const CourseList: React.FC<CourseListProps> = ({
                 <motion.button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`px-4 py-2 rounded-lg font-medium ${
+                  className={`px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-medium text-sm sm:text-base ${
                     currentPage === page ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
                   } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
                   aria-current={currentPage === page ? "page" : undefined}
@@ -280,7 +278,7 @@ const CourseList: React.FC<CourseListProps> = ({
               whileHover={{ scale: currentPage === totalPages ? 1 : 1.1 }}
               whileTap={{ scale: currentPage === totalPages ? 1 : 0.9 }}
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 sm:w-6 h-5 sm:h-6" />
             </motion.button>
           </motion.nav>
         )}

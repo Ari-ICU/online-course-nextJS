@@ -9,7 +9,7 @@ import { coursesMeta } from '@/data/course';
 import { courseCurriculums } from '@/data/coursesContent';
 import { enrolledCourseIds } from '@/data/enrolledCourses';
 import { Module, Lesson } from '@/types';
-import { Star, Clock, Bot } from 'lucide-react';
+import { Star, Clock, Bot, Menu } from 'lucide-react';
 
 // Define the type for AI-generated timestamps
 interface AITimestamp {
@@ -27,7 +27,6 @@ const CourseLearnPage = () => {
   const router = useRouter();
   const params = useParams();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
-
   const [loading, setLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
@@ -39,6 +38,7 @@ const CourseLearnPage = () => {
     manual: { time: string; label: string }[];
     aiGenerated: { time: string; label: string; confidence: number }[];
   } | null>(null);
+  const [isCurriculumOpen, setIsCurriculumOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Simulate dynamic fetching of timestamps
@@ -148,6 +148,7 @@ const CourseLearnPage = () => {
     } else {
       setDynamicTimestamps(null);
     }
+    setIsCurriculumOpen(false); // Close curriculum on mobile after selection
   }, [allLessons, fetchTimestamps]);
 
   const handleRating = useCallback((rating: number) => {
@@ -184,15 +185,15 @@ const CourseLearnPage = () => {
     return (
       <>
         <Header />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
-          <div className="flex flex-col lg:flex-row gap-8">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 min-h-screen">
+          <div className="flex flex-col gap-6 sm:gap-8">
             <section className="flex-1">
               <div className="animate-pulse">
-                <div className="h-10 bg-gray-200 rounded-lg w-3/4 mb-4"></div>
+                <div className="h-8 sm:h-10 bg-gray-200 rounded-lg w-3/4 mb-4"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/2 mb-6"></div>
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                  <div className="p-6">
-                    <div className="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
+                  <div className="p-4 sm:p-6">
+                    <div className="h-6 sm:h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
                     <div className="aspect-[16/9] bg-gray-100 rounded-lg mb-4"></div>
                     <div className="space-y-2">
                       <div className="h-4 bg-gray-200 rounded"></div>
@@ -202,13 +203,13 @@ const CourseLearnPage = () => {
                 </div>
               </div>
             </section>
-            <aside className="lg:w-80 flex-shrink-0">
+            <aside className="lg:hidden">
               <div className="animate-pulse space-y-4">
-                {Array.from({ length: 4 }).map((_, i) => (
+                {Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="p-4 border border-gray-200 rounded-lg">
                     <div className="h-5 bg-gray-200 rounded w-4/5 mb-2"></div>
                     <div className="space-y-2">
-                      {Array.from({ length: 3 }).map((_, j) => (
+                      {Array.from({ length: 2 }).map((_, j) => (
                         <div key={j} className="h-4 bg-gray-100 rounded w-full"></div>
                       ))}
                     </div>
@@ -229,12 +230,12 @@ const CourseLearnPage = () => {
     return (
       <>
         <Header />
-        <main className="max-w-4xl mx-auto p-6 min-h-[80vh] flex flex-col items-center justify-center text-center bg-gradient-to-b from-red-50 to-white">
-          <h1 className="text-3xl font-bold text-red-600 mb-4">Course Not Found</h1>
-          <p className="text-gray-600 mb-6">The requested course does not exist or is unavailable.</p>
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 min-h-[80vh] flex flex-col items-center justify-center text-center bg-gradient-to-b from-red-50 to-white">
+          <h1 className="text-2xl sm:text-3xl font-bold text-red-600 mb-4">Course Not Found</h1>
+          <p className="text-base sm:text-lg text-gray-600 mb-6">The requested course does not exist or is unavailable.</p>
           <a
             href="/courses"
-            className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
+            className="inline-block px-6 py-2.5 sm:py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm sm:text-base"
             aria-label="Browse available courses"
           >
             Explore Courses
@@ -247,26 +248,46 @@ const CourseLearnPage = () => {
 
   return (
     <>
+      <style jsx>{`
+        .animate-fade-up {
+          animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .curriculum-overlay {
+          transition: transform 0.3s ease-in-out;
+        }
+        @media (max-width: 1023px) {
+          .curriculum-overlay.translate-x-full {
+            transform: translateX(100%);
+          }
+          .curriculum-overlay.translate-x-0 {
+            transform: translateX(0);
+          }
+        }
+      `}</style>
       <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen bg-gradient-to-b from-slate-50 to-white">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 min-h-screen bg-gradient-to-b from-slate-50 to-white">
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8">
           <section className="flex-1 animate-fade-up">
-            <header className="mb-8">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight">
+            <header className="mb-6 sm:mb-8">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 leading-tight">
                 {courseMeta.title}
               </h1>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mt-2 sm:mt-3">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-gray-500" aria-hidden="true" />
-                  <p className="text-base sm:text-lg text-gray-600">
+                  <Clock className="w-4 sm:w-5 h-4 sm:h-5 text-gray-500" aria-hidden="true" />
+                  <p className="text-sm sm:text-base text-gray-600">
                     Total Duration: <span className="font-medium">{courseMeta.duration}</span>
                   </p>
                 </div>
-                <div className="flex items-center gap-2" aria-label="Rate this course">
+                <div className="flex items-center gap-1 sm:gap-2" aria-label="Rate this course">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`w-5 h-5 cursor-pointer transition-transform duration-200 hover:scale-110 ${
+                      className={`w-4 sm:w-5 h-4 sm:h-5 cursor-pointer transition-transform duration-200 hover:scale-110 ${
                         (hoverRating ?? userRating ?? 0) >= star
                           ? 'text-yellow-500 fill-current'
                           : 'text-gray-300'
@@ -274,11 +295,18 @@ const CourseLearnPage = () => {
                       onClick={() => handleRating(star)}
                       onMouseEnter={() => setHoverRating(star)}
                       onMouseLeave={() => setHoverRating(null)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          handleRating(star);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
                       aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
                     />
                   ))}
                   {userRating && (
-                    <span className="text-sm text-gray-600 ml-2">
+                    <span className="text-xs sm:text-sm text-gray-600 ml-2">
                       Your rating: {userRating}/5
                     </span>
                   )}
@@ -286,26 +314,38 @@ const CourseLearnPage = () => {
               </div>
             </header>
 
+            <div className="lg:hidden mb-4">
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 w-full sm:w-auto"
+                onClick={() => setIsCurriculumOpen(!isCurriculumOpen)}
+                aria-label={isCurriculumOpen ? 'Close curriculum' : 'Open curriculum'}
+                aria-expanded={isCurriculumOpen}
+              >
+                <Menu className="w-4 sm:w-5 h-4 sm:h-5" aria-hidden="true" />
+                {isCurriculumOpen ? 'Close Curriculum' : 'View Curriculum'}
+              </button>
+            </div>
+
             {selectedLesson ? (
               <article
                 className="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 animate-fade-up"
                 aria-labelledby={`lesson-title-${selectedLesson.id}`}
               >
-                <div className="p-6 sm:p-8">
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
+                <div className="p-4 sm:p-6 lg:p-8">
+                  <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-4 sm:mb-6">
                     <h2
                       id={`lesson-title-${selectedLesson.id}`}
-                      className="text-xl sm:text-2xl font-semibold text-gray-800"
+                      className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800"
                     >
                       {selectedLesson.title}
                     </h2>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                    <div className="flex items-center gap-2 sm:gap-4">
+                      <span className="text-xs sm:text-sm font-medium text-blue-600 bg-blue-50 px-2 sm:px-3 py-1 rounded-full">
                         {selectedLesson.duration}
                       </span>
                       {selectedLesson.lastAccessed && (
-                        <span className="flex items-center gap-1 text-xs text-gray-600">
-                          <Clock className="w-4 h-4" aria-hidden="true" />
+                        <span className="flex items-center gap-1 text-xs sm:text-sm text-gray-600">
+                          <Clock className="w-3 sm:w-4 h-3 sm:h-4" aria-hidden="true" />
                           Last accessed: {formatTimestamp(selectedLesson.lastAccessed)}
                         </span>
                       )}
@@ -314,34 +354,34 @@ const CourseLearnPage = () => {
 
                   {selectedLesson.type === 'video' && (selectedLesson.content || dynamicTimestamps) ? (
                     <>
-                      <div className="aspect-[16/9] bg-black rounded-lg overflow-hidden mb-6">
+                      <div className="aspect-[16/9] bg-black rounded-lg overflow-hidden mb-4 sm:mb-6">
                         <video
                           ref={videoRef}
                           controls
                           preload="metadata"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                           src={selectedLesson.content || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'}
                           aria-label={`Video: ${selectedLesson.title}`}
                         />
                       </div>
                       {(selectedLesson.timestamps || selectedLesson.aiGeneratedTimestamps) && (
-                        <div className="mt-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-lg font-semibold text-gray-800">
+                        <div className="mt-4 sm:mt-6">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-800">
                               {showAITimestamps ? 'AI-Generated Chapters' : 'Video Chapters'}
                             </h3>
                             {(selectedLesson.timestamps && selectedLesson.aiGeneratedTimestamps) && (
                               <button
-                                className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-indigo-600 hover:to-blue-500 transition-all duration-200 flex items-center gap-2"
+                                className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:from-indigo-600 hover:to-blue-500 transition-all duration-200 flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
                                 onClick={() => setShowAITimestamps(!showAITimestamps)}
                                 aria-label={`Switch to ${showAITimestamps ? 'manual' : 'AI-generated'} timestamps`}
                               >
-                                <Bot className="w-4 h-4" aria-hidden="true" />
+                                <Bot className="w-3 sm:w-4 h-3 sm:h-4" aria-hidden="true" />
                                 {showAITimestamps ? 'Show Manual Chapters' : 'Show AI Chapters'}
                               </button>
                             )}
                           </div>
-                          <ul className="space-y-2" aria-label="Video timestamps">
+                          <ul className="space-y-1 sm:space-y-2" aria-label="Video timestamps">
                             {(showAITimestamps ? selectedLesson.aiGeneratedTimestamps : selectedLesson.timestamps)?.map((ts, index) => (
                               <li
                                 key={index}
@@ -358,11 +398,11 @@ const CourseLearnPage = () => {
                                 }}
                                 aria-label={`Jump to ${ts.time} - ${ts.label}${showAITimestamps && isAITimestamp(ts) ? ` (Confidence: ${(ts.confidence * 100).toFixed(1)}%)` : ''}`}
                               >
-                                <Clock className="w-4 h-4 text-gray-500" aria-hidden="true" />
-                                <span className="text-sm text-gray-700">
+                                <Clock className="w-3 sm:w-4 h-3 sm:h-4 text-gray-500" aria-hidden="true" />
+                                <span className="text-xs sm:text-sm text-gray-700">
                                   <span className="font-medium">{ts.time}</span> {ts.label}
                                   {showAITimestamps && isAITimestamp(ts) && (
-                                    <span className="text-xs text-blue-600 ml-2">
+                                    <span className="text-xs text-blue-600 ml-1 sm:ml-2">
                                       (Confidence: {(ts.confidence * 100).toFixed(1)}%)
                                     </span>
                                   )}
@@ -386,21 +426,21 @@ const CourseLearnPage = () => {
 
                   {selectedLesson.type === 'quiz' && (
                     <div
-                      className="py-8 text-center text-gray-500 bg-gray-50 rounded-lg"
+                      className="py-6 sm:py-8 text-center text-gray-500 bg-gray-50 rounded-lg"
                       aria-label="Quiz content placeholder"
                     >
-                      <p className="italic">Quiz content is not available yet.</p>
+                      <p className="italic text-sm sm:text-base">Quiz content is not available yet.</p>
                     </div>
                   )}
                 </div>
               </article>
             ) : (
               <div
-                className="text-center py-16 text-gray-500 animate-fade-up"
+                className="text-center py-12 sm:py-16 text-gray-500 animate-fade-up"
                 aria-label="No lesson selected"
               >
                 <svg
-                  className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                  className="w-12 sm:w-16 h-12 sm:h-16 mx-auto mb-4 text-gray-300"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -413,15 +453,28 @@ const CourseLearnPage = () => {
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                <p className="text-xl font-medium">Select a lesson to begin learning.</p>
+                <p className="text-lg sm:text-xl font-medium">Select a lesson to begin learning.</p>
               </div>
             )}
           </section>
 
           <aside
-            className="lg:w-80 flex-shrink-0 lg:sticky lg:top-24 lg:self-start animate-fade-up"
-            style={{ maxHeight: 'calc(100vh - 6rem)', overflowY: 'auto' }}
+            className={`lg:w-80 flex-shrink-0 lg:sticky lg:top-24 lg:self-start transition-all duration-300 ${
+              isCurriculumOpen ? 'translate-x-0' : 'translate-x-full'
+            } lg:translate-x-0 fixed inset-y-0 right-0 w-3/4 sm:w-1/2 max-w-sm bg-white shadow-xl z-50 curriculum-overlay lg:shadow-none lg:bg-transparent lg:z-auto lg:max-w-none lg:h-auto`}
+            style={{ maxHeight: 'calc(100vh - 4rem)', overflowY: 'auto' }}
+            aria-hidden={!isCurriculumOpen && !window.matchMedia('(min-width: 1024px)').matches}
           >
+            <div className="lg:hidden p-4 border-b border-gray-200">
+              <button
+                className="flex items-center gap-2 text-gray-700 font-semibold"
+                onClick={() => setIsCurriculumOpen(false)}
+                aria-label="Close curriculum"
+              >
+                <Menu className="w-4 h-4" aria-hidden="true" />
+                Close
+              </button>
+            </div>
             <Curriculum
               course={{ ...courseMeta, curriculum: enhancedCurriculum }}
               selectedLessonId={selectedLessonId}

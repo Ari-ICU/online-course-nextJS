@@ -1,5 +1,3 @@
-// src/components/course-list/CourseCard.tsx
-
 'use client';
 
 import { memo, useState, useMemo } from 'react';
@@ -18,7 +16,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { Course } from '@/types';
-import { useEnrollmentStore } from '@/store/enrollment';
+import { enrolledCourseIds } from '@/data/enrolledCourses';
 
 // Define category icons
 const categoryIcons: Record<string, React.ElementType> = {
@@ -34,14 +32,13 @@ const categoryIcons: Record<string, React.ElementType> = {
 // Props interface
 interface CourseCardProps {
   course: Course;
-  isEnrolled: boolean; // Add isEnrolled to the interface
+  isEnrolled?: boolean; // Optional, as enrollment can be checked via enrolledCourseIds
 }
 
 // Memoized CourseCard component
-const CourseCard: React.FC<CourseCardProps> = ({ course, isEnrolled }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, isEnrolled: propIsEnrolled }) => {
   const [imgError, setImgError] = useState(false);
-  const { enrolledCourses } = useEnrollmentStore();
-  const isEnrolledFromStore = useMemo(() => enrolledCourses.includes(course.slug), [enrolledCourses, course.slug]);
+  const isEnrolled = useMemo(() => propIsEnrolled ?? enrolledCourseIds.includes(course.slug ?? ''), [propIsEnrolled, course.slug]);
   const Icon = useMemo(() => categoryIcons[course.category ?? 'default'] || categoryIcons.default, [course.category]);
   const slug = course.slug?.trim() || '';
 
@@ -72,56 +69,56 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isEnrolled }) => {
       aria-labelledby={`course-title-${course.id}`}
     >
       {/* Image & Badges */}
-      <div className="relative aspect-video">
+      <div className="relative aspect-[4/3] sm:aspect-video">
         {!imgError && course.image ? (
           <Image
             src={course.image}
             alt={`${course.title} – ${course.category} course cover`}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             loading="lazy"
             onError={() => setImgError(true)}
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-            <Icon className="w-16 h-16 text-gray-300" aria-hidden="true" />
+            <Icon className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300" aria-hidden="true" />
           </div>
         )}
 
         {/* Badges */}
         {discountPercentage && (
-          <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">
+          <span className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full shadow">
             SAVE {discountPercentage}%
           </span>
         )}
 
         {course.featured && (
-          <span className="absolute top-3 right-3 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md animate-pulse">
+          <span className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 text-white text-xs sm:text-sm font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-md animate-pulse">
             🌟 Bestseller
           </span>
         )}
 
         {isEnrolled && (
-          <span className="absolute top-3 left-3 bg-green-500 text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow flex items-center">
-            <CheckCircle className="w-4 h-4 mr-1" aria-hidden="true" />
+          <span className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-green-500 text-white text-xs sm:text-sm font-semibold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full shadow flex items-center">
+            <CheckCircle className="w-3 sm:w-4 h-3 sm:h-4 mr-1" aria-hidden="true" />
             Enrolled
           </span>
         )}
       </div>
 
       {/* Content */}
-      <div className="p-5 sm:p-6">
+      <div className="p-4 sm:p-6">
         {/* Category & Level */}
         {(course.category || course.level) && (
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             {course.category && (
-              <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+              <span className="text-xs sm:text-sm font-semibold text-blue-600 bg-blue-50 px-2 sm:px-3 py-1 rounded-full">
                 {course.category}
               </span>
             )}
             {course.level && (
-              <span className="text-xs px-3 py-1 rounded-full font-medium bg-gray-100 text-gray-700">
+              <span className="text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full font-medium bg-gray-100 text-gray-700">
                 {course.level}
               </span>
             )}
@@ -131,32 +128,32 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isEnrolled }) => {
         {/* Title */}
         <h3
           id={`course-title-${course.id}`}
-          className="text-lg sm:text-xl font-extrabold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors duration-200"
+          className="text-base sm:text-lg md:text-xl font-extrabold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors duration-200"
         >
           {course.title}
         </h3>
 
         {/* Description */}
         {course.description && (
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2 leading-relaxed">
+          <p className="text-gray-600 text-xs sm:text-sm mb-3 line-clamp-2 leading-relaxed">
             {course.description}
           </p>
         )}
 
         {/* Instructor */}
         {course.instructor && (
-          <p className="text-sm text-gray-700 font-medium mb-4">
+          <p className="text-xs sm:text-sm text-gray-700 font-medium mb-4">
             By {course.instructor.name}
           </p>
         )}
 
         {/* Stats */}
         {(course.rating || course.students || course.duration) && (
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 mb-4">
+          <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-500 mb-4">
             {course.rating && (
               <div className="flex items-center">
                 <Star
-                  className="w-4 h-4 text-yellow-500 fill-current mr-1"
+                  className="w-3 sm:w-4 h-3 sm:h-4 text-yellow-500 fill-current mr-1"
                   aria-hidden="true"
                 />
                 <span className="font-semibold text-gray-700">
@@ -170,7 +167,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isEnrolled }) => {
             {course.students && (
               <div className="flex items-center">
                 <Users
-                  className="w-4 h-4 mr-1 text-gray-400"
+                  className="w-3 sm:w-4 h-3 sm:h-4 mr-1 text-gray-400"
                   aria-hidden="true"
                 />
                 <span>{course.students.toLocaleString()} students</span>
@@ -179,7 +176,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isEnrolled }) => {
             {course.duration && (
               <div className="flex items-center">
                 <Clock
-                  className="w-4 h-4 mr-1 text-gray-400"
+                  className="w-3 sm:w-4 h-3 sm:h-4 mr-1 text-gray-400"
                   aria-hidden="true"
                 />
                 <span>{course.duration}</span>
@@ -190,11 +187,11 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isEnrolled }) => {
 
         {/* Skills */}
         {course.skills && course.skills.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-5">
+          <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-4 sm:mb-5">
             {course.skills.slice(0, 3).map((skill, index) => (
               <span
                 key={index}
-                className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded-full border border-indigo-100"
+                className="text-xs bg-indigo-50 text-indigo-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full border border-indigo-100"
               >
                 {skill}
               </span>
@@ -208,13 +205,13 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isEnrolled }) => {
         )}
 
         {/* Price & CTA */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-extrabold text-gray-900">
+            <span className="text-lg sm:text-xl font-extrabold text-gray-900">
               ${formattedPrice}
             </span>
             {formattedOriginalPrice && (
-              <span className="text-sm text-gray-500 line-through">
+              <span className="text-xs sm:text-sm text-gray-500 line-through">
                 ${formattedOriginalPrice}
               </span>
             )}
@@ -223,7 +220,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isEnrolled }) => {
           <Link
             href={isEnrolled ? `/courses/${slug}/learn` : `/courses/${slug}`}
             prefetch={false}
-            className={`px-5 py-2.5 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 focus:ring-2 focus:ring-offset-2 text-center text-sm ${
+            className={`px-4 sm:px-5 py-2 sm:py-2.5 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 focus:ring-2 focus:ring-offset-2 text-xs sm:text-sm text-center ${
               isEnrolled
                 ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
                 : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:ring-blue-500'
@@ -246,6 +243,6 @@ export default memo(CourseCard, (prevProps, nextProps) => {
     prevProps.course.price === nextProps.course.price &&
     prevProps.course.originalPrice === nextProps.course.originalPrice &&
     prevProps.course.featured === nextProps.course.featured &&
-    prevProps.isEnrolled === nextProps.isEnrolled // Add isEnrolled to memo comparison
+    prevProps.isEnrolled === nextProps.isEnrolled
   );
 });

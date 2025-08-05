@@ -1,4 +1,3 @@
-// src/components/MyLearningPage.tsx (partial update)
 'use client';
 
 import React from 'react';
@@ -8,13 +7,11 @@ import CourseCard from '@/components/course-list/CourseCard';
 import { Course } from '@/types';
 import { coursesMeta } from '@/data/course';
 import { courseCurriculums } from '@/data/coursesContent';
-import { useEnrollmentStore } from '@/store/enrollment';
+import { enrolledCourseIds } from '@/data/enrolledCourses';
 
 const MyLearningPage: React.FC = () => {
-  const { enrolledCourses, user } = useEnrollmentStore();
-
   const enrolledCoursesData: Course[] = coursesMeta
-    .filter((course) => enrolledCourses.includes(course.slug))
+    .filter((course) => enrolledCourseIds.includes(course.slug))
     .map((course) => ({
       ...course,
       curriculum: courseCurriculums[course.slug] ?? [],
@@ -70,7 +67,7 @@ const MyLearningPage: React.FC = () => {
         aria-label="My Learning courses"
       >
         <h1 className="title text-4xl sm:text-5xl font-extrabold mb-10 text-center tracking-tight">
-          {user ? `${user.name}'s Learning Journey` : 'My Learning Journey'}
+          My Learning Journey
         </h1>
 
         {enrolledCoursesData.length === 0 ? (
