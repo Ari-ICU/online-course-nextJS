@@ -17,15 +17,13 @@ export default function LayoutWithDynamicMain() {
 
       {/* Main content changes based on route */}
       <main className="flex flex-col items-center justify-center text-center gap-6 p-4">
-        {pathname === '/courses' ? (
-          <CourseList />
-        ) : (
+       
           <>
             <CTASection courseTitle="Advanced React Development" price={89.99} />
             <CourseList />
             <FeaturesSection />
           </>
-        )}
+       
       </main>
 
       {/* Footer */}

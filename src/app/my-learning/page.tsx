@@ -53,12 +53,12 @@ const MyLearningPage: React.FC = () => {
           padding: 2rem;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
-        .title {
-          background: linear-gradient(to right, #2563eb, #7c3aed);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
+        // .title {
+        //   background: linear-gradient(to right, #2563eb, #7c3aed);
+        //   -webkit-background-clip: text;
+        //   background-clip: text;
+        //   color: transparent;
+        // }
       `}</style>
 
       <Header />
