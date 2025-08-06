@@ -23,22 +23,22 @@ const features = [
 
 const FeaturesSection: React.FC = () => {
   return (
-    <section className="py-20">
-      <div className="container mx-auto px-6">
-        <h2 className="text-4xl font-extrabold text-center text-gray-900 mb-14">
+    <section className="py-12 sm:py-16 lg:py-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-center text-gray-900 mb-10 sm:mb-12 lg:mb-14">
           Why Learn With Us?
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl shadow-md p-8 flex flex-col items-center text-center transition-transform hover:scale-105 hover:shadow-lg"
+              className="bg-white rounded-2xl shadow-md p-6 sm:p-8 flex flex-col items-center text-center transition-transform hover:scale-105 hover:shadow-lg"
             >
-              <div className="mb-6">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-3">
+              <div className="mb-4 sm:mb-6">{feature.icon}</div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2 sm:mb-3">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
                 {feature.description}
               </p>
             </div>
